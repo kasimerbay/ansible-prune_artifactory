@@ -1,0 +1,34 @@
+---
+- name: Stop Artifactory
+  ansible.builtin.service:
+    name: artifactory
+    state: stopped
+
+- name: Disable Artifactory
+  ansible.builtin.service:
+    name: artifactory
+    enabled: no
+
+- name: Remove Artifactory
+  ansible.builtin.yum:
+    name: jfrog-artifactory-pro
+    state: absent
+
+- name: Remove the user 'postgres'
+  ansible.builtin.user:
+    name: artifactory
+    state: absent
+    remove: yes
+
+- name: yum-clean-metadata
+  ansible.builtin.command: yum clean metadata
+
+- name: Remove Artifactory Configuration Files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /var/opt/jfrog
+    - /opt/jfrog
+    - /appdata/artifactory
+    # - Add here if you have more 
